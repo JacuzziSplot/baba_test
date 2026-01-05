@@ -3,8 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Baba Is You - Clone</title>
+    <title>Baba Is You - Clone Avancé</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
         * {
             margin: 0;
             padding: 0;
@@ -12,235 +14,407 @@
         }
 
         body {
-            background: #1a1a2e;
+            background: linear-gradient(135deg, #0a0a1a 0%, #1a1a3e 50%, #0a0a1a 100%);
             min-height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            font-family: 'Courier New', monospace;
+            font-family: 'Press Start 2P', 'Courier New', monospace;
             color: #fff;
+            overflow-x: hidden;
+        }
+
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
         }
 
         h1 {
             margin-bottom: 10px;
-            color: #ff6b9d;
-            text-shadow: 0 0 10px #ff6b9d;
+            font-size: 28px;
+            background: linear-gradient(90deg, #ff6b9d, #c44569, #ff6b9d);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: shine 3s linear infinite;
+            text-shadow: 0 0 30px rgba(255, 107, 157, 0.5);
+        }
+
+        @keyframes shine {
+            to { background-position: 200% center; }
         }
 
         .info {
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             color: #88c0d0;
+            font-size: 10px;
+            text-shadow: 0 0 10px rgba(136, 192, 208, 0.5);
         }
 
         #game-container {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 20px;
+            gap: 15px;
+        }
+
+        .canvas-wrapper {
+            position: relative;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow:
+                0 0 50px rgba(136, 192, 208, 0.3),
+                0 0 100px rgba(255, 107, 157, 0.2),
+                inset 0 0 50px rgba(0, 0, 0, 0.5);
         }
 
         #game-canvas {
-            border: 4px solid #4a4a6a;
+            display: block;
+            border: 4px solid;
+            border-image: linear-gradient(45deg, #4a4a6a, #88c0d0, #ff6b9d, #4a4a6a) 1;
             border-radius: 8px;
-            box-shadow: 0 0 30px rgba(136, 192, 208, 0.3);
         }
 
         .controls {
             display: flex;
-            gap: 15px;
+            gap: 10px;
             flex-wrap: wrap;
             justify-content: center;
         }
 
         button {
-            padding: 10px 20px;
-            font-size: 16px;
-            font-family: 'Courier New', monospace;
-            background: #4a4a6a;
+            padding: 12px 20px;
+            font-size: 10px;
+            font-family: 'Press Start 2P', 'Courier New', monospace;
+            background: linear-gradient(180deg, #4a4a6a 0%, #2a2a4a 100%);
             color: #fff;
             border: 2px solid #88c0d0;
-            border-radius: 5px;
+            border-radius: 8px;
             cursor: pointer;
             transition: all 0.3s;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
         }
 
         button:hover {
-            background: #88c0d0;
+            background: linear-gradient(180deg, #88c0d0 0%, #5a8a9a 100%);
             color: #1a1a2e;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(136, 192, 208, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
         }
 
         .rules-display {
-            margin-top: 15px;
+            margin-top: 10px;
             padding: 15px;
-            background: #2a2a4e;
-            border-radius: 8px;
-            min-width: 300px;
+            background: linear-gradient(180deg, rgba(42, 42, 78, 0.9) 0%, rgba(26, 26, 46, 0.9) 100%);
+            border-radius: 10px;
+            border: 2px solid #4a4a6a;
+            min-width: 350px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
         }
 
         .rules-display h3 {
             color: #ff6b9d;
             margin-bottom: 10px;
+            font-size: 12px;
         }
 
         .rules-display p {
             color: #a0d0a0;
             margin: 5px 0;
+            font-size: 9px;
         }
 
         .message {
             position: fixed;
             top: 50%;
             left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(0, 0, 0, 0.9);
-            padding: 40px;
-            border-radius: 15px;
-            border: 3px solid #ff6b9d;
+            transform: translate(-50%, -50%) scale(0);
+            background: linear-gradient(180deg, rgba(20, 20, 40, 0.98) 0%, rgba(10, 10, 30, 0.98) 100%);
+            padding: 50px;
+            border-radius: 20px;
+            border: 4px solid #ff6b9d;
             text-align: center;
             z-index: 100;
-            display: none;
+            box-shadow: 0 0 50px rgba(255, 107, 157, 0.5);
+            transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .message.show {
+            transform: translate(-50%, -50%) scale(1);
         }
 
         .message h2 {
             color: #ff6b9d;
-            font-size: 32px;
+            font-size: 24px;
             margin-bottom: 20px;
+            animation: pulse 1s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .message p {
+            font-size: 12px;
+            margin-bottom: 20px;
+            color: #88c0d0;
         }
 
         .message button {
-            margin-top: 15px;
+            margin: 5px;
         }
 
         .level-info {
-            font-size: 18px;
+            font-size: 14px;
             color: #ffd700;
             margin-bottom: 5px;
+            text-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+        }
+
+        .level-description {
+            font-size: 9px;
+            color: #aaa;
+            margin-bottom: 10px;
+            max-width: 500px;
+            text-align: center;
         }
 
         .instructions {
-            margin-top: 20px;
-            padding: 15px;
-            background: #2a2a4e;
-            border-radius: 8px;
-            max-width: 600px;
+            margin-top: 15px;
+            padding: 15px 25px;
+            background: linear-gradient(180deg, rgba(42, 42, 78, 0.8) 0%, rgba(26, 26, 46, 0.8) 100%);
+            border-radius: 10px;
+            border: 2px solid #4a4a6a;
+            max-width: 650px;
             text-align: center;
         }
 
         .instructions h3 {
             color: #88c0d0;
             margin-bottom: 10px;
+            font-size: 11px;
         }
 
         .instructions p {
             color: #ccc;
-            line-height: 1.6;
+            line-height: 2;
+            font-size: 8px;
         }
 
         .key {
             display: inline-block;
-            padding: 2px 8px;
-            background: #4a4a6a;
+            padding: 4px 8px;
+            background: linear-gradient(180deg, #5a5a7a 0%, #3a3a5a 100%);
             border-radius: 4px;
             margin: 0 3px;
+            border: 1px solid #888;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .difficulty {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 8px;
+            margin-left: 10px;
+        }
+
+        .difficulty.easy { background: #2e7d32; }
+        .difficulty.medium { background: #f57c00; }
+        .difficulty.hard { background: #c62828; }
+        .difficulty.extreme { background: #6a1b9a; }
+
+        .move-counter {
+            font-size: 10px;
+            color: #88c0d0;
+            margin-top: 5px;
         }
     </style>
 </head>
 <body>
-    <h1>🐰 BABA IS YOU 🐰</h1>
+    <canvas class="stars" id="stars-canvas"></canvas>
+
+    <h1>BABA IS YOU</h1>
     <p class="level-info" id="level-info">Niveau 1</p>
-    <p class="info">Pousse les mots pour changer les règles !</p>
+    <p class="level-description" id="level-description"></p>
+    <p class="info">Pousse les mots pour changer les règles du jeu !</p>
+    <p class="move-counter">Mouvements: <span id="move-count">0</span></p>
 
     <div id="game-container">
-        <canvas id="game-canvas" width="640" height="480"></canvas>
+        <div class="canvas-wrapper">
+            <canvas id="game-canvas" width="800" height="560"></canvas>
+        </div>
 
         <div class="controls">
-            <button onclick="game.restart()">🔄 Recommencer (R)</button>
-            <button onclick="game.undo()">↩️ Annuler (Z)</button>
-            <button onclick="game.previousLevel()">⬅️ Niveau Précédent</button>
-            <button onclick="game.nextLevel()">➡️ Niveau Suivant</button>
+            <button onclick="game.restart()">RESTART (R)</button>
+            <button onclick="game.undo()">UNDO (Z)</button>
+            <button onclick="game.previousLevel()">< PREV</button>
+            <button onclick="game.nextLevel()">NEXT ></button>
         </div>
 
         <div class="rules-display">
-            <h3>📜 Règles Actives</h3>
+            <h3>REGLES ACTIVES</h3>
             <div id="active-rules"></div>
         </div>
 
         <div class="instructions">
-            <h3>Comment Jouer</h3>
+            <h3>CONTROLES</h3>
             <p>
-                Utilise <span class="key">↑</span><span class="key">↓</span><span class="key">←</span><span class="key">→</span> ou <span class="key">ZQSD</span> pour te déplacer.<br>
-                Pousse les mots pour créer des règles comme <strong>BABA IS YOU</strong> ou <strong>FLAG IS WIN</strong>.<br>
-                <span class="key">R</span> pour recommencer, <span class="key">Z</span> pour annuler.
+                <span class="key">↑</span><span class="key">↓</span><span class="key">←</span><span class="key">→</span> ou <span class="key">ZQSD</span> pour bouger
+                <span class="key">R</span> restart
+                <span class="key">Z</span> undo
             </p>
         </div>
     </div>
 
     <div class="message" id="win-message">
-        <h2>🎉 VICTOIRE ! 🎉</h2>
-        <p>Tu as résolu le puzzle !</p>
-        <button onclick="game.nextLevel()">Niveau Suivant</button>
-        <button onclick="game.restart()">Rejouer</button>
+        <h2>VICTOIRE !</h2>
+        <p id="win-stats"></p>
+        <button onclick="game.nextLevel()">NIVEAU SUIVANT</button>
+        <button onclick="game.restart()">REJOUER</button>
     </div>
 
     <script>
+        // ==================== ETOILES ANIMEES ====================
+        const starsCanvas = document.getElementById('stars-canvas');
+        const starsCtx = starsCanvas.getContext('2d');
+
+        function resizeStars() {
+            starsCanvas.width = window.innerWidth;
+            starsCanvas.height = window.innerHeight;
+        }
+        resizeStars();
+        window.addEventListener('resize', resizeStars);
+
+        const stars = [];
+        for (let i = 0; i < 200; i++) {
+            stars.push({
+                x: Math.random() * window.innerWidth,
+                y: Math.random() * window.innerHeight,
+                size: Math.random() * 2 + 0.5,
+                speed: Math.random() * 0.5 + 0.1,
+                brightness: Math.random()
+            });
+        }
+
+        function animateStars() {
+            starsCtx.clearRect(0, 0, starsCanvas.width, starsCanvas.height);
+
+            for (const star of stars) {
+                star.brightness += (Math.random() - 0.5) * 0.1;
+                star.brightness = Math.max(0.3, Math.min(1, star.brightness));
+
+                starsCtx.fillStyle = `rgba(255, 255, 255, ${star.brightness})`;
+                starsCtx.beginPath();
+                starsCtx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
+                starsCtx.fill();
+
+                star.y += star.speed;
+                if (star.y > starsCanvas.height) {
+                    star.y = 0;
+                    star.x = Math.random() * starsCanvas.width;
+                }
+            }
+
+            requestAnimationFrame(animateStars);
+        }
+        animateStars();
+
         // ==================== CONFIGURATION ====================
         const TILE_SIZE = 40;
-        const GRID_WIDTH = 16;
-        const GRID_HEIGHT = 12;
+        const GRID_WIDTH = 20;
+        const GRID_HEIGHT = 14;
 
         // Types d'objets
         const ObjectType = {
             EMPTY: 0,
-            // Entités (objets du jeu)
             BABA: 'baba',
             WALL: 'wall',
             ROCK: 'rock',
             FLAG: 'flag',
             WATER: 'water',
             LAVA: 'lava',
-            // Mots - Noms
+            KEY: 'key',
+            DOOR: 'door',
+            SKULL: 'skull',
+            GRASS: 'grass',
+            ICE: 'ice',
+            // Textes
             TEXT_BABA: 'text_baba',
             TEXT_WALL: 'text_wall',
             TEXT_ROCK: 'text_rock',
             TEXT_FLAG: 'text_flag',
             TEXT_WATER: 'text_water',
             TEXT_LAVA: 'text_lava',
-            // Mots - Opérateur
+            TEXT_KEY: 'text_key',
+            TEXT_DOOR: 'text_door',
+            TEXT_SKULL: 'text_skull',
+            TEXT_GRASS: 'text_grass',
+            TEXT_ICE: 'text_ice',
             TEXT_IS: 'text_is',
-            // Mots - Propriétés
+            TEXT_AND: 'text_and',
             TEXT_YOU: 'text_you',
             TEXT_WIN: 'text_win',
             TEXT_STOP: 'text_stop',
             TEXT_PUSH: 'text_push',
             TEXT_SINK: 'text_sink',
             TEXT_DEFEAT: 'text_defeat',
+            TEXT_MELT: 'text_melt',
+            TEXT_HOT: 'text_hot',
+            TEXT_OPEN: 'text_open',
+            TEXT_SHUT: 'text_shut',
         };
 
-        // Couleurs
+        // Couleurs avec dégradés
         const Colors = {
-            baba: '#ffffff',
-            wall: '#8b6914',
-            rock: '#a0522d',
-            flag: '#ffd700',
-            water: '#4169e1',
-            lava: '#ff4500',
+            baba: { main: '#ffffff', accent: '#ffccdd' },
+            wall: { main: '#8b6914', accent: '#a67c00' },
+            rock: { main: '#8b7355', accent: '#a08060' },
+            flag: { main: '#ffd700', accent: '#ffec8b' },
+            water: { main: '#1e90ff', accent: '#87ceeb' },
+            lava: { main: '#ff4500', accent: '#ff6347' },
+            key: { main: '#ffd700', accent: '#fff8dc' },
+            door: { main: '#8b0000', accent: '#cd5c5c' },
+            skull: { main: '#dcdcdc', accent: '#ffffff' },
+            grass: { main: '#228b22', accent: '#32cd32' },
+            ice: { main: '#b0e0e6', accent: '#e0ffff' },
             text_baba: '#ff9999',
             text_wall: '#d4a574',
             text_rock: '#cd853f',
             text_flag: '#ffeb3b',
             text_water: '#87ceeb',
             text_lava: '#ff7043',
+            text_key: '#ffd700',
+            text_door: '#cd5c5c',
+            text_skull: '#dcdcdc',
+            text_grass: '#90ee90',
+            text_ice: '#b0e0e6',
             text_is: '#ffffff',
+            text_and: '#ffffff',
             text_you: '#ff69b4',
             text_win: '#ffff00',
             text_stop: '#8b4513',
             text_push: '#90ee90',
             text_sink: '#1e90ff',
             text_defeat: '#ff0000',
+            text_melt: '#87ceeb',
+            text_hot: '#ff6347',
+            text_open: '#ffd700',
+            text_shut: '#8b0000',
         };
 
-        // Mapping texte -> entité
         const TextToEntity = {
             'text_baba': 'baba',
             'text_wall': 'wall',
@@ -248,84 +422,264 @@
             'text_flag': 'flag',
             'text_water': 'water',
             'text_lava': 'lava',
+            'text_key': 'key',
+            'text_door': 'door',
+            'text_skull': 'skull',
+            'text_grass': 'grass',
+            'text_ice': 'ice',
         };
 
-        // ==================== NIVEAUX ====================
+        // ==================== NIVEAUX DIFFICILES ====================
         const levels = [
             {
-                name: "Niveau 1 - Introduction",
-                description: "Atteins le drapeau pour gagner !",
+                name: "Niveau 1 - Le Piège",
+                difficulty: "medium",
+                description: "Les murs te bloquent. Trouve comment atteindre le drapeau en changeant les règles.",
                 grid: [
-                    // Format: [x, y, type]
-                    // Règle BABA IS YOU (horizontale en haut à gauche)
+                    // BABA IS YOU (protégé en haut)
                     [1, 1, 'text_baba'], [2, 1, 'text_is'], [3, 1, 'text_you'],
-                    // Règle FLAG IS WIN (horizontale en haut à droite)
-                    [10, 1, 'text_flag'], [11, 1, 'text_is'], [12, 1, 'text_win'],
-                    // Règle WALL IS STOP (verticale à droite)
-                    [14, 3, 'text_wall'], [14, 4, 'text_is'], [14, 5, 'text_stop'],
-                    // Baba
-                    [3, 6, 'baba'],
-                    // Murs
-                    [6, 4, 'wall'], [6, 5, 'wall'], [6, 6, 'wall'], [6, 7, 'wall'], [6, 8, 'wall'],
-                    [7, 4, 'wall'], [8, 4, 'wall'],
-                    [7, 8, 'wall'], [8, 8, 'wall'],
-                    // Drapeau
-                    [10, 6, 'flag'],
-                ]
-            },
-            {
-                name: "Niveau 2 - Transformation",
-                description: "Change les règles pour gagner !",
-                grid: [
-                    // Règle BABA IS YOU
-                    [1, 1, 'text_baba'], [2, 1, 'text_is'], [3, 1, 'text_you'],
-                    // Règle WALL IS STOP
-                    [1, 3, 'text_wall'], [2, 3, 'text_is'], [3, 3, 'text_stop'],
-                    // Mots séparés à pousser pour créer ROCK IS PUSH
-                    [8, 1, 'text_rock'],
-                    [10, 1, 'text_push'],
-                    // IS supplémentaire
-                    [12, 5, 'text_is'],
-                    // FLAG IS WIN (à reconstruire)
-                    [13, 8, 'text_flag'],
-                    [13, 10, 'text_win'],
-                    // Baba
+                    // WALL IS STOP
+                    [16, 1, 'text_wall'], [17, 1, 'text_is'], [18, 1, 'text_stop'],
+                    // FLAG IS WIN (à droite)
+                    [16, 12, 'text_flag'], [17, 12, 'text_is'], [18, 12, 'text_win'],
+                    // ROCK IS PUSH disponible
+                    [1, 12, 'text_rock'], [3, 12, 'text_push'],
+                    // IS supplémentaire (pour casser WALL IS STOP)
+                    [9, 6, 'text_is'],
+                    // Baba dans un coin
                     [2, 6, 'baba'],
-                    // Murs formant un labyrinthe
-                    [5, 2, 'wall'], [5, 3, 'wall'], [5, 4, 'wall'], [5, 5, 'wall'], [5, 6, 'wall'], [5, 7, 'wall'], [5, 8, 'wall'],
-                    [6, 8, 'wall'], [7, 8, 'wall'], [8, 8, 'wall'], [9, 8, 'wall'], [10, 8, 'wall'],
-                    // Rocher bloquant le chemin
-                    [7, 5, 'rock'],
-                    [8, 5, 'rock'],
-                    // Drapeau derrière les rochers
+                    // Labyrinthe de murs complexe
+                    [5, 2, 'wall'], [5, 3, 'wall'], [5, 4, 'wall'], [5, 5, 'wall'], [5, 6, 'wall'], [5, 7, 'wall'], [5, 8, 'wall'], [5, 9, 'wall'], [5, 10, 'wall'],
+                    [6, 2, 'wall'], [7, 2, 'wall'], [8, 2, 'wall'], [9, 2, 'wall'], [10, 2, 'wall'], [11, 2, 'wall'], [12, 2, 'wall'], [13, 2, 'wall'],
+                    [13, 3, 'wall'], [13, 4, 'wall'], [13, 5, 'wall'], [13, 6, 'wall'], [13, 7, 'wall'], [13, 8, 'wall'], [13, 9, 'wall'], [13, 10, 'wall'],
+                    [6, 10, 'wall'], [7, 10, 'wall'], [8, 10, 'wall'], [9, 10, 'wall'], [10, 10, 'wall'], [11, 10, 'wall'], [12, 10, 'wall'],
+                    // Rochers à pousser
+                    [7, 6, 'rock'], [8, 6, 'rock'], [10, 6, 'rock'], [11, 6, 'rock'],
+                    // Drapeau au centre du labyrinthe
                     [9, 5, 'flag'],
                 ]
             },
             {
-                name: "Niveau 3 - Danger",
-                description: "L'eau est dangereuse... ou pas ?",
+                name: "Niveau 2 - Transformation Mortelle",
+                difficulty: "hard",
+                description: "La lave tue. Mais peut-être que la lave peut devenir autre chose ?",
                 grid: [
-                    // Règle BABA IS YOU
+                    // BABA IS YOU
                     [1, 1, 'text_baba'], [2, 1, 'text_is'], [3, 1, 'text_you'],
-                    // Règle FLAG IS WIN
-                    [1, 3, 'text_flag'], [2, 3, 'text_is'], [3, 3, 'text_win'],
-                    // Règle WATER IS SINK (à modifier)
-                    [10, 1, 'text_water'], [11, 1, 'text_is'], [12, 1, 'text_sink'],
-                    // Règle ROCK IS PUSH
-                    [10, 3, 'text_rock'], [11, 3, 'text_is'], [12, 3, 'text_push'],
-                    // STOP disponible
-                    [14, 5, 'text_stop'],
+                    // LAVA IS DEFEAT (danger!)
+                    [1, 3, 'text_lava'], [2, 3, 'text_is'], [3, 3, 'text_defeat'],
+                    // FLAG IS WIN
+                    [16, 1, 'text_flag'], [17, 1, 'text_is'], [18, 1, 'text_win'],
+                    // WALL IS STOP
+                    [16, 3, 'text_wall'], [17, 3, 'text_is'], [18, 3, 'text_stop'],
+                    // Mots disponibles pour créer une solution
+                    [1, 11, 'text_rock'],
+                    [5, 11, 'text_push'],
+                    [9, 11, 'text_water'],
+                    [13, 11, 'text_sink'],
+                    // IS supplémentaires cachés
+                    [7, 7, 'text_is'],
+                    // Baba
+                    [2, 7, 'baba'],
+                    // Mer de lave à traverser
+                    [6, 4, 'lava'], [7, 4, 'lava'], [8, 4, 'lava'], [9, 4, 'lava'], [10, 4, 'lava'], [11, 4, 'lava'], [12, 4, 'lava'],
+                    [6, 5, 'lava'], [7, 5, 'lava'], [8, 5, 'lava'], [9, 5, 'lava'], [10, 5, 'lava'], [11, 5, 'lava'], [12, 5, 'lava'],
+                    [6, 6, 'lava'], [7, 6, 'lava'], [8, 6, 'lava'], [9, 6, 'lava'], [10, 6, 'lava'], [11, 6, 'lava'], [12, 6, 'lava'],
+                    [6, 7, 'lava'], [8, 7, 'lava'], [9, 7, 'lava'], [10, 7, 'lava'], [11, 7, 'lava'], [12, 7, 'lava'],
+                    [6, 8, 'lava'], [7, 8, 'lava'], [8, 8, 'lava'], [9, 8, 'lava'], [10, 8, 'lava'], [11, 8, 'lava'], [12, 8, 'lava'],
+                    // Murs encadrant
+                    [5, 3, 'wall'], [5, 4, 'wall'], [5, 5, 'wall'], [5, 6, 'wall'], [5, 7, 'wall'], [5, 8, 'wall'], [5, 9, 'wall'],
+                    [13, 3, 'wall'], [13, 4, 'wall'], [13, 5, 'wall'], [13, 6, 'wall'], [13, 7, 'wall'], [13, 8, 'wall'], [13, 9, 'wall'],
+                    [6, 9, 'wall'], [7, 9, 'wall'], [8, 9, 'wall'], [9, 9, 'wall'], [10, 9, 'wall'], [11, 9, 'wall'], [12, 9, 'wall'],
+                    // Rochers pour potentiellement bloquer
+                    [3, 5, 'rock'], [3, 6, 'rock'], [3, 8, 'rock'],
+                    // Drapeau de l'autre côté
+                    [15, 6, 'flag'],
+                ]
+            },
+            {
+                name: "Niveau 3 - Le Paradoxe",
+                difficulty: "hard",
+                description: "Tu contrôles Baba... mais que se passe-t-il si Baba devient autre chose ?",
+                grid: [
+                    // BABA IS YOU (peut être modifié)
+                    [2, 1, 'text_baba'], [3, 1, 'text_is'], [4, 1, 'text_you'],
+                    // ROCK IS STOP
+                    [14, 1, 'text_rock'], [15, 1, 'text_is'], [16, 1, 'text_stop'],
+                    // FLAG IS WIN
+                    [14, 12, 'text_flag'], [15, 12, 'text_is'], [16, 12, 'text_win'],
+                    // WALL IS STOP
+                    [2, 12, 'text_wall'], [3, 12, 'text_is'], [4, 12, 'text_stop'],
+                    // Mots clés pour la transformation
+                    [9, 3, 'text_rock'], // ROCK comme nom
+                    [1, 7, 'text_push'],
+                    // Baba coincé
+                    [3, 7, 'baba'],
+                    // Barrière de rochers infranchissable (STOP)
+                    [7, 4, 'rock'], [8, 4, 'rock'], [9, 4, 'rock'], [10, 4, 'rock'], [11, 4, 'rock'],
+                    [7, 5, 'rock'], [11, 5, 'rock'],
+                    [7, 6, 'rock'], [11, 6, 'rock'],
+                    [7, 7, 'rock'], [11, 7, 'rock'],
+                    [7, 8, 'rock'], [11, 8, 'rock'],
+                    [7, 9, 'rock'], [8, 9, 'rock'], [9, 9, 'rock'], [10, 9, 'rock'], [11, 9, 'rock'],
+                    // Murs extérieurs
+                    [0, 3, 'wall'], [0, 4, 'wall'], [0, 5, 'wall'], [0, 6, 'wall'], [0, 7, 'wall'], [0, 8, 'wall'], [0, 9, 'wall'], [0, 10, 'wall'],
+                    [19, 3, 'wall'], [19, 4, 'wall'], [19, 5, 'wall'], [19, 6, 'wall'], [19, 7, 'wall'], [19, 8, 'wall'], [19, 9, 'wall'], [19, 10, 'wall'],
+                    // Drapeau à l'intérieur de la prison de rochers
+                    [9, 6, 'flag'],
+                ]
+            },
+            {
+                name: "Niveau 4 - Noyade Stratégique",
+                difficulty: "extreme",
+                description: "L'eau engloutit tout. Utilise les rochers comme pont... ou pas.",
+                grid: [
+                    // BABA IS YOU
+                    [1, 1, 'text_baba'], [2, 1, 'text_is'], [3, 1, 'text_you'],
+                    // WATER IS SINK
+                    [1, 3, 'text_water'], [2, 3, 'text_is'], [3, 3, 'text_sink'],
+                    // ROCK IS PUSH
+                    [15, 1, 'text_rock'], [16, 1, 'text_is'], [17, 1, 'text_push'],
+                    // FLAG IS WIN
+                    [15, 3, 'text_flag'], [16, 3, 'text_is'], [17, 3, 'text_win'],
+                    // WALL IS STOP
+                    [8, 1, 'text_wall'], [9, 1, 'text_is'], [10, 1, 'text_stop'],
+                    // Baba
+                    [2, 7, 'baba'],
+                    // Grande étendue d'eau (besoin de plusieurs rochers pour traverser)
+                    [5, 5, 'water'], [6, 5, 'water'], [7, 5, 'water'], [8, 5, 'water'], [9, 5, 'water'], [10, 5, 'water'], [11, 5, 'water'], [12, 5, 'water'], [13, 5, 'water'],
+                    [5, 6, 'water'], [6, 6, 'water'], [7, 6, 'water'], [8, 6, 'water'], [9, 6, 'water'], [10, 6, 'water'], [11, 6, 'water'], [12, 6, 'water'], [13, 6, 'water'],
+                    [5, 7, 'water'], [6, 7, 'water'], [7, 7, 'water'], [8, 7, 'water'], [9, 7, 'water'], [10, 7, 'water'], [11, 7, 'water'], [12, 7, 'water'], [13, 7, 'water'],
+                    [5, 8, 'water'], [6, 8, 'water'], [7, 8, 'water'], [8, 8, 'water'], [9, 8, 'water'], [10, 8, 'water'], [11, 8, 'water'], [12, 8, 'water'], [13, 8, 'water'],
+                    [5, 9, 'water'], [6, 9, 'water'], [7, 9, 'water'], [8, 9, 'water'], [9, 9, 'water'], [10, 9, 'water'], [11, 9, 'water'], [12, 9, 'water'], [13, 9, 'water'],
+                    // Murs qui forcent un chemin précis
+                    [4, 4, 'wall'], [4, 5, 'wall'], [4, 6, 'wall'], [4, 7, 'wall'], [4, 8, 'wall'], [4, 9, 'wall'], [4, 10, 'wall'],
+                    [14, 4, 'wall'], [14, 5, 'wall'], [14, 6, 'wall'], [14, 7, 'wall'], [14, 8, 'wall'], [14, 9, 'wall'], [14, 10, 'wall'],
+                    [5, 10, 'wall'], [6, 10, 'wall'], [7, 10, 'wall'], [8, 10, 'wall'], [9, 10, 'wall'], [10, 10, 'wall'], [11, 10, 'wall'], [12, 10, 'wall'], [13, 10, 'wall'],
+                    // Rochers limités (juste assez pour faire un chemin si on est précis)
+                    [2, 5, 'rock'],
+                    [2, 6, 'rock'],
+                    [2, 8, 'rock'],
+                    [2, 9, 'rock'],
+                    [3, 10, 'rock'],
+                    // Drapeau de l'autre côté
+                    [17, 7, 'flag'],
+                ]
+            },
+            {
+                name: "Niveau 5 - La Clé et la Porte",
+                difficulty: "extreme",
+                description: "OPEN et SHUT... la clé ouvre la porte. Mais comment arriver à la clé ?",
+                grid: [
+                    // BABA IS YOU
+                    [1, 1, 'text_baba'], [2, 1, 'text_is'], [3, 1, 'text_you'],
+                    // KEY IS OPEN
+                    [7, 1, 'text_key'], [8, 1, 'text_is'], [9, 1, 'text_open'],
+                    // DOOR IS SHUT
+                    [13, 1, 'text_door'], [14, 1, 'text_is'], [15, 1, 'text_shut'],
+                    // FLAG IS WIN
+                    [1, 12, 'text_flag'], [2, 12, 'text_is'], [3, 12, 'text_win'],
+                    // WALL IS STOP
+                    [15, 12, 'text_wall'], [16, 12, 'text_is'], [17, 12, 'text_stop'],
+                    // ROCK IS PUSH
+                    [8, 12, 'text_rock'], [9, 12, 'text_is'], [10, 12, 'text_push'],
                     // Baba
                     [2, 6, 'baba'],
-                    // Eau (obstacle)
-                    [5, 5, 'water'], [6, 5, 'water'], [7, 5, 'water'], [8, 5, 'water'],
-                    [5, 6, 'water'], [6, 6, 'water'], [7, 6, 'water'], [8, 6, 'water'],
-                    [5, 7, 'water'], [6, 7, 'water'], [7, 7, 'water'], [8, 7, 'water'],
-                    // Rochers pour traverser
-                    [3, 8, 'rock'],
-                    [3, 9, 'rock'],
-                    // Drapeau de l'autre côté
-                    [12, 6, 'flag'],
+                    // Portes bloquant le passage
+                    [6, 4, 'door'], [6, 5, 'door'], [6, 6, 'door'], [6, 7, 'door'], [6, 8, 'door'],
+                    [12, 4, 'door'], [12, 5, 'door'], [12, 6, 'door'], [12, 7, 'door'], [12, 8, 'door'],
+                    // Murs créant des couloirs
+                    [5, 3, 'wall'], [5, 4, 'wall'], [5, 5, 'wall'], [5, 6, 'wall'], [5, 7, 'wall'], [5, 8, 'wall'], [5, 9, 'wall'],
+                    [7, 3, 'wall'], [7, 9, 'wall'],
+                    [11, 3, 'wall'], [11, 9, 'wall'],
+                    [13, 3, 'wall'], [13, 4, 'wall'], [13, 5, 'wall'], [13, 6, 'wall'], [13, 7, 'wall'], [13, 8, 'wall'], [13, 9, 'wall'],
+                    [8, 3, 'wall'], [9, 3, 'wall'], [10, 3, 'wall'],
+                    [8, 9, 'wall'], [9, 9, 'wall'], [10, 9, 'wall'],
+                    // Clés (une seule accessible facilement)
+                    [9, 6, 'key'],
+                    // Rochers bloquants
+                    [4, 5, 'rock'], [4, 6, 'rock'], [4, 7, 'rock'],
+                    [15, 5, 'rock'], [15, 6, 'rock'], [15, 7, 'rock'],
+                    // Drapeau final (derrière la dernière porte)
+                    [17, 6, 'flag'],
+                ]
+            },
+            {
+                name: "Niveau 6 - Tout Est Connecté",
+                difficulty: "extreme",
+                description: "AND permet de combiner... BABA AND ROCK IS YOU ?",
+                grid: [
+                    // BABA IS YOU (va être détruit!)
+                    [1, 1, 'text_baba'], [2, 1, 'text_is'], [3, 1, 'text_you'],
+                    // FLAG IS WIN
+                    [16, 1, 'text_flag'], [17, 1, 'text_is'], [18, 1, 'text_win'],
+                    // WALL IS STOP
+                    [1, 12, 'text_wall'], [2, 12, 'text_is'], [3, 12, 'text_stop'],
+                    // AND disponible
+                    [10, 5, 'text_and'],
+                    [10, 8, 'text_and'],
+                    // Mots supplémentaires
+                    [6, 10, 'text_rock'],
+                    [14, 10, 'text_push'],
+                    [6, 3, 'text_is'],
+                    // Baba dans une prison qui va exploser
+                    [9, 6, 'baba'],
+                    // Prison de murs autour de Baba
+                    [7, 4, 'wall'], [8, 4, 'wall'], [9, 4, 'wall'], [10, 4, 'wall'], [11, 4, 'wall'],
+                    [7, 5, 'wall'], [11, 5, 'wall'],
+                    [7, 6, 'wall'], [11, 6, 'wall'],
+                    [7, 7, 'wall'], [11, 7, 'wall'],
+                    [7, 8, 'wall'], [8, 8, 'wall'], [9, 8, 'wall'], [10, 8, 'wall'], [11, 8, 'wall'],
+                    // Rochers autour (pour devenir YOU avec AND)
+                    [8, 5, 'rock'], [10, 5, 'rock'],
+                    [8, 7, 'rock'], [10, 7, 'rock'],
+                    // Eau mortelle autour
+                    [5, 4, 'water'], [5, 5, 'water'], [5, 6, 'water'], [5, 7, 'water'], [5, 8, 'water'],
+                    [13, 4, 'water'], [13, 5, 'water'], [13, 6, 'water'], [13, 7, 'water'], [13, 8, 'water'],
+                    // Texte WATER IS SINK
+                    [16, 12, 'text_water'], [17, 12, 'text_is'], [18, 12, 'text_sink'],
+                    // Drapeau au loin
+                    [17, 6, 'flag'],
+                ]
+            },
+            {
+                name: "Niveau 7 - Le Maître",
+                difficulty: "extreme",
+                description: "Tous les concepts réunis. Seul un vrai maître peut résoudre ce puzzle.",
+                grid: [
+                    // BABA IS YOU (modifiable)
+                    [1, 1, 'text_baba'], [2, 1, 'text_is'], [3, 1, 'text_you'],
+                    // SKULL IS DEFEAT
+                    [1, 3, 'text_skull'], [2, 3, 'text_is'], [3, 3, 'text_defeat'],
+                    // LAVA IS HOT
+                    [16, 1, 'text_lava'], [17, 1, 'text_is'], [18, 1, 'text_hot'],
+                    // ICE IS MELT
+                    [16, 3, 'text_ice'], [17, 3, 'text_is'], [18, 3, 'text_melt'],
+                    // FLAG IS WIN
+                    [8, 12, 'text_flag'], [9, 12, 'text_is'], [10, 12, 'text_win'],
+                    // WALL IS STOP
+                    [1, 12, 'text_wall'], [2, 12, 'text_is'], [3, 12, 'text_stop'],
+                    // Mots utiles dispersés
+                    [5, 7, 'text_rock'], [13, 7, 'text_push'],
+                    [7, 4, 'text_is'],
+                    [12, 4, 'text_is'],
+                    // Baba
+                    [2, 7, 'baba'],
+                    // Mur de crânes (DEFEAT)
+                    [6, 5, 'skull'], [7, 5, 'skull'], [8, 5, 'skull'], [9, 5, 'skull'], [10, 5, 'skull'], [11, 5, 'skull'], [12, 5, 'skull'],
+                    // Mur de glace (fond avec la lave)
+                    [6, 8, 'ice'], [7, 8, 'ice'], [8, 8, 'ice'], [9, 8, 'ice'], [10, 8, 'ice'], [11, 8, 'ice'], [12, 8, 'ice'],
+                    // Lave derrière
+                    [6, 9, 'lava'], [7, 9, 'lava'], [8, 9, 'lava'], [9, 9, 'lava'], [10, 9, 'lava'], [11, 9, 'lava'], [12, 9, 'lava'],
+                    // Murs encadrant
+                    [5, 4, 'wall'], [5, 5, 'wall'], [5, 6, 'wall'], [5, 7, 'wall'], [5, 8, 'wall'], [5, 9, 'wall'], [5, 10, 'wall'],
+                    [13, 4, 'wall'], [13, 5, 'wall'], [13, 6, 'wall'], [13, 7, 'wall'], [13, 8, 'wall'], [13, 9, 'wall'], [13, 10, 'wall'],
+                    [6, 10, 'wall'], [7, 10, 'wall'], [8, 10, 'wall'], [9, 10, 'wall'], [10, 10, 'wall'], [11, 10, 'wall'], [12, 10, 'wall'],
+                    // Rochers
+                    [3, 5, 'rock'], [3, 6, 'rock'], [3, 8, 'rock'],
+                    [15, 5, 'rock'], [15, 6, 'rock'], [15, 8, 'rock'],
+                    // Drapeau au centre du danger
+                    [9, 7, 'flag'],
                 ]
             }
         ];
@@ -340,13 +694,14 @@
                 this.history = [];
                 this.rules = new Map();
                 this.won = false;
+                this.moveCount = 0;
+                this.animationFrame = 0;
 
                 this.loadLevel(this.currentLevel);
                 this.setupInput();
-                this.render();
+                this.gameLoop();
             }
 
-            // Charger un niveau
             loadLevel(levelIndex) {
                 if (levelIndex < 0 || levelIndex >= levels.length) return;
 
@@ -354,8 +709,8 @@
                 this.grid = [];
                 this.history = [];
                 this.won = false;
+                this.moveCount = 0;
 
-                // Initialiser la grille vide
                 for (let y = 0; y < GRID_HEIGHT; y++) {
                     this.grid[y] = [];
                     for (let x = 0; x < GRID_WIDTH; x++) {
@@ -363,7 +718,6 @@
                     }
                 }
 
-                // Placer les objets
                 const level = levels[levelIndex];
                 for (const [x, y, type] of level.grid) {
                     if (x >= 0 && x < GRID_WIDTH && y >= 0 && y < GRID_HEIGHT) {
@@ -373,64 +727,111 @@
 
                 this.parseRules();
                 this.updateLevelInfo();
-                this.render();
+                this.updateMoveCount();
 
-                document.getElementById('win-message').style.display = 'none';
+                document.getElementById('win-message').classList.remove('show');
             }
 
-            // Mettre à jour les infos du niveau
             updateLevelInfo() {
                 const level = levels[this.currentLevel];
-                document.getElementById('level-info').textContent = level.name;
+                const difficultySpan = `<span class="difficulty ${level.difficulty}">${level.difficulty.toUpperCase()}</span>`;
+                document.getElementById('level-info').innerHTML = level.name + difficultySpan;
+                document.getElementById('level-description').textContent = level.description;
             }
 
-            // Parser les règles du jeu
+            updateMoveCount() {
+                document.getElementById('move-count').textContent = this.moveCount;
+            }
+
             parseRules() {
                 this.rules.clear();
 
-                // Chercher les règles horizontales: NOUN IS PROPERTY
+                // Règles horizontales avec support AND
                 for (let y = 0; y < GRID_HEIGHT; y++) {
                     for (let x = 0; x < GRID_WIDTH - 2; x++) {
-                        const cell1 = this.grid[y][x];
-                        const cell2 = this.grid[y][x + 1];
-                        const cell3 = this.grid[y][x + 2];
-
-                        if (cell1.length && cell2.length && cell3.length) {
-                            const noun = cell1.find(o => o.type.startsWith('text_') && o.type !== 'text_is' && !this.isProperty(o.type));
-                            const is = cell2.find(o => o.type === 'text_is');
-                            const prop = cell3.find(o => this.isProperty(o.type) || (o.type.startsWith('text_') && o.type !== 'text_is'));
-
-                            if (noun && is && prop) {
-                                this.addRule(noun.type, prop.type);
-                            }
-                        }
+                        this.parseRuleAt(x, y, 1, 0);
                     }
                 }
 
-                // Chercher les règles verticales: NOUN IS PROPERTY
+                // Règles verticales avec support AND
                 for (let y = 0; y < GRID_HEIGHT - 2; y++) {
                     for (let x = 0; x < GRID_WIDTH; x++) {
-                        const cell1 = this.grid[y][x];
-                        const cell2 = this.grid[y + 1][x];
-                        const cell3 = this.grid[y + 2][x];
-
-                        if (cell1.length && cell2.length && cell3.length) {
-                            const noun = cell1.find(o => o.type.startsWith('text_') && o.type !== 'text_is' && !this.isProperty(o.type));
-                            const is = cell2.find(o => o.type === 'text_is');
-                            const prop = cell3.find(o => this.isProperty(o.type) || (o.type.startsWith('text_') && o.type !== 'text_is'));
-
-                            if (noun && is && prop) {
-                                this.addRule(noun.type, prop.type);
-                            }
-                        }
+                        this.parseRuleAt(x, y, 0, 1);
                     }
                 }
 
                 this.updateRulesDisplay();
             }
 
+            parseRuleAt(startX, startY, dx, dy) {
+                const nouns = [];
+                let foundIs = false;
+                const properties = [];
+
+                let x = startX;
+                let y = startY;
+
+                // Parser la première partie (noms)
+                while (x >= 0 && x < GRID_WIDTH && y >= 0 && y < GRID_HEIGHT) {
+                    const cell = this.grid[y][x];
+                    if (!cell.length) break;
+
+                    const textObj = cell.find(o => o.type.startsWith('text_'));
+                    if (!textObj) break;
+
+                    if (textObj.type === 'text_is') {
+                        foundIs = true;
+                        x += dx;
+                        y += dy;
+                        break;
+                    } else if (textObj.type === 'text_and') {
+                        // Continue
+                    } else if (this.isNoun(textObj.type)) {
+                        nouns.push(textObj.type);
+                    } else {
+                        break;
+                    }
+
+                    x += dx;
+                    y += dy;
+                }
+
+                if (!foundIs || nouns.length === 0) return;
+
+                // Parser la deuxième partie (propriétés ou transformations)
+                while (x >= 0 && x < GRID_WIDTH && y >= 0 && y < GRID_HEIGHT) {
+                    const cell = this.grid[y][x];
+                    if (!cell.length) break;
+
+                    const textObj = cell.find(o => o.type.startsWith('text_'));
+                    if (!textObj) break;
+
+                    if (textObj.type === 'text_and') {
+                        // Continue
+                    } else if (this.isProperty(textObj.type) || this.isNoun(textObj.type)) {
+                        properties.push(textObj.type);
+                    } else {
+                        break;
+                    }
+
+                    x += dx;
+                    y += dy;
+                }
+
+                // Créer les règles
+                for (const noun of nouns) {
+                    for (const prop of properties) {
+                        this.addRule(noun, prop);
+                    }
+                }
+            }
+
+            isNoun(type) {
+                return TextToEntity[type] !== undefined;
+            }
+
             isProperty(type) {
-                return ['text_you', 'text_win', 'text_stop', 'text_push', 'text_sink', 'text_defeat'].includes(type);
+                return ['text_you', 'text_win', 'text_stop', 'text_push', 'text_sink', 'text_defeat', 'text_melt', 'text_hot', 'text_open', 'text_shut'].includes(type);
             }
 
             addRule(noun, property) {
@@ -441,7 +842,6 @@
                     this.rules.set(entity, new Set());
                 }
 
-                // Si la propriété est une entité (transformation)
                 if (TextToEntity[property]) {
                     this.rules.get(entity).add('transform_' + TextToEntity[property]);
                 } else {
@@ -451,7 +851,6 @@
             }
 
             hasProperty(type, property) {
-                // Tous les textes sont poussables par défaut
                 if (type.startsWith('text_') && property === 'push') {
                     return true;
                 }
@@ -464,21 +863,21 @@
                 const container = document.getElementById('active-rules');
                 container.innerHTML = '';
 
+                const rulesList = [];
                 for (const [entity, props] of this.rules) {
                     for (const prop of props) {
-                        const p = document.createElement('p');
                         const displayProp = prop.startsWith('transform_') ? prop.replace('transform_', '') : prop;
-                        p.textContent = `${entity.toUpperCase()} IS ${displayProp.toUpperCase()}`;
-                        container.appendChild(p);
+                        rulesList.push(`${entity.toUpperCase()} IS ${displayProp.toUpperCase()}`);
                     }
                 }
 
-                if (container.children.length === 0) {
+                if (rulesList.length === 0) {
                     container.innerHTML = '<p style="color: #666">Aucune règle active</p>';
+                } else {
+                    container.innerHTML = rulesList.map(r => `<p>${r}</p>`).join('');
                 }
             }
 
-            // Sauvegarder l'état pour l'annulation
             saveState() {
                 const state = JSON.stringify(this.grid);
                 this.history.push(state);
@@ -487,17 +886,16 @@
                 }
             }
 
-            // Annuler le dernier mouvement
             undo() {
-                if (this.history.length === 0) return;
+                if (this.history.length === 0 || this.won) return;
 
                 const state = this.history.pop();
                 this.grid = JSON.parse(state);
+                this.moveCount = Math.max(0, this.moveCount - 1);
+                this.updateMoveCount();
                 this.parseRules();
-                this.render();
             }
 
-            // Gérer les entrées clavier
             setupInput() {
                 document.addEventListener('keydown', (e) => {
                     if (this.won) return;
@@ -505,30 +903,12 @@
                     let dx = 0, dy = 0;
 
                     switch (e.key.toLowerCase()) {
-                        case 'arrowup':
-                        case 'z':
-                        case 'w':
-                            dy = -1;
-                            break;
-                        case 'arrowdown':
-                        case 's':
-                            dy = 1;
-                            break;
-                        case 'arrowleft':
-                        case 'q':
-                        case 'a':
-                            dx = -1;
-                            break;
-                        case 'arrowright':
-                        case 'd':
-                            dx = 1;
-                            break;
-                        case 'r':
-                            this.restart();
-                            return;
-                        case 'u':
-                            this.undo();
-                            return;
+                        case 'arrowup': case 'z': case 'w': dy = -1; break;
+                        case 'arrowdown': case 's': dy = 1; break;
+                        case 'arrowleft': case 'q': case 'a': dx = -1; break;
+                        case 'arrowright': case 'd': dx = 1; break;
+                        case 'r': this.restart(); return;
+                        case 'u': this.undo(); return;
                     }
 
                     if (dx !== 0 || dy !== 0) {
@@ -538,11 +918,9 @@
                 });
             }
 
-            // Déplacer tous les objets "YOU"
             move(dx, dy) {
                 this.saveState();
 
-                // Trouver tous les objets contrôlés par le joueur
                 const youObjects = [];
                 for (let y = 0; y < GRID_HEIGHT; y++) {
                     for (let x = 0; x < GRID_WIDTH; x++) {
@@ -554,57 +932,63 @@
                     }
                 }
 
-                if (youObjects.length === 0) {
-                    // Plus de "YOU" = défaite
-                    return;
-                }
+                if (youObjects.length === 0) return;
 
-                // Trier pour éviter les conflits de mouvement
                 if (dx > 0) youObjects.sort((a, b) => b.x - a.x);
                 if (dx < 0) youObjects.sort((a, b) => a.x - b.x);
                 if (dy > 0) youObjects.sort((a, b) => b.y - a.y);
                 if (dy < 0) youObjects.sort((a, b) => a.y - b.y);
 
-                // Déplacer chaque objet YOU
+                let moved = false;
                 for (const { x, y, obj } of youObjects) {
-                    this.tryMove(x, y, obj, dx, dy);
+                    if (this.tryMove(x, y, obj, dx, dy)) {
+                        moved = true;
+                    }
                 }
 
-                // Appliquer les transformations
+                if (moved) {
+                    this.moveCount++;
+                    this.updateMoveCount();
+                }
+
                 this.applyTransformations();
-
-                // Vérifier les interactions (sink, defeat)
                 this.checkInteractions();
-
-                // Recalculer les règles
                 this.parseRules();
-
-                // Vérifier la victoire
                 this.checkWin();
-
-                this.render();
             }
 
-            // Essayer de déplacer un objet
             tryMove(x, y, obj, dx, dy) {
                 const newX = x + dx;
                 const newY = y + dy;
 
-                // Vérifier les limites
                 if (newX < 0 || newX >= GRID_WIDTH || newY < 0 || newY >= GRID_HEIGHT) {
                     return false;
                 }
 
-                // Vérifier les obstacles
                 const targetCell = this.grid[newY][newX];
 
+                // Vérifier SHUT (portes fermées)
                 for (const targetObj of targetCell) {
-                    // Si l'objet est STOP, on ne peut pas passer
+                    if (this.hasProperty(targetObj.type, 'shut')) {
+                        // Vérifier si on a OPEN
+                        if (this.hasProperty(obj.type, 'open')) {
+                            // Ouvrir la porte (détruire les deux)
+                            this.grid[newY][newX] = targetCell.filter(o => o !== targetObj);
+                            const index = this.grid[y][x].indexOf(obj);
+                            if (index > -1) {
+                                this.grid[y][x].splice(index, 1);
+                            }
+                            return true;
+                        }
+                        return false;
+                    }
+                }
+
+                for (const targetObj of [...targetCell]) {
                     if (this.hasProperty(targetObj.type, 'stop')) {
                         return false;
                     }
 
-                    // Si l'objet est PUSH, essayer de le pousser
                     if (this.hasProperty(targetObj.type, 'push')) {
                         if (!this.tryMove(newX, newY, targetObj, dx, dy)) {
                             return false;
@@ -612,7 +996,6 @@
                     }
                 }
 
-                // Effectuer le mouvement
                 const index = this.grid[y][x].indexOf(obj);
                 if (index > -1) {
                     this.grid[y][x].splice(index, 1);
@@ -622,13 +1005,11 @@
                 return true;
             }
 
-            // Appliquer les transformations (NOUN IS NOUN)
             applyTransformations() {
                 for (const [entity, props] of this.rules) {
                     for (const prop of props) {
                         if (prop.startsWith('transform_')) {
                             const newType = prop.replace('transform_', '');
-
                             for (let y = 0; y < GRID_HEIGHT; y++) {
                                 for (let x = 0; x < GRID_WIDTH; x++) {
                                     for (const obj of this.grid[y][x]) {
@@ -643,33 +1024,37 @@
                 }
             }
 
-            // Vérifier les interactions (SINK, DEFEAT)
             checkInteractions() {
                 for (let y = 0; y < GRID_HEIGHT; y++) {
                     for (let x = 0; x < GRID_WIDTH; x++) {
                         const cell = this.grid[y][x];
 
-                        // SINK: détruit tout ce qui rentre dedans
+                        // HOT + MELT = destruction
+                        const hotObj = cell.find(o => this.hasProperty(o.type, 'hot'));
+                        const meltObj = cell.find(o => this.hasProperty(o.type, 'melt'));
+                        if (hotObj && meltObj && hotObj !== meltObj) {
+                            this.grid[y][x] = cell.filter(o => o !== meltObj);
+                        }
+
+                        // SINK
                         const sinkObj = cell.find(o => this.hasProperty(o.type, 'sink'));
                         if (sinkObj) {
                             const others = cell.filter(o => o !== sinkObj && !o.type.startsWith('text_'));
                             if (others.length > 0) {
-                                // Tout coule !
                                 this.grid[y][x] = cell.filter(o => o.type.startsWith('text_'));
                             }
                         }
 
-                        // DEFEAT: tue YOU
+                        // DEFEAT
                         const defeatObj = cell.find(o => this.hasProperty(o.type, 'defeat'));
                         const youObj = cell.find(o => this.hasProperty(o.type, 'you'));
-                        if (defeatObj && youObj) {
+                        if (defeatObj && youObj && defeatObj !== youObj) {
                             this.grid[y][x] = cell.filter(o => o !== youObj);
                         }
                     }
                 }
             }
 
-            // Vérifier la condition de victoire
             checkWin() {
                 for (let y = 0; y < GRID_HEIGHT; y++) {
                     for (let x = 0; x < GRID_WIDTH; x++) {
@@ -679,8 +1064,9 @@
 
                         if (hasYou && hasWin) {
                             this.won = true;
+                            document.getElementById('win-stats').textContent = `Complété en ${this.moveCount} mouvements !`;
                             setTimeout(() => {
-                                document.getElementById('win-message').style.display = 'block';
+                                document.getElementById('win-message').classList.add('show');
                             }, 300);
                             return;
                         }
@@ -688,35 +1074,41 @@
                 }
             }
 
-            // Recommencer le niveau
             restart() {
                 this.loadLevel(this.currentLevel);
             }
 
-            // Niveau suivant
             nextLevel() {
                 if (this.currentLevel < levels.length - 1) {
                     this.loadLevel(this.currentLevel + 1);
                 } else {
-                    alert('Félicitations ! Tu as terminé tous les niveaux !');
+                    alert('FELICITATIONS ! Tu as terminé tous les niveaux !');
                 }
             }
 
-            // Niveau précédent
             previousLevel() {
                 if (this.currentLevel > 0) {
                     this.loadLevel(this.currentLevel - 1);
                 }
             }
 
-            // Rendu graphique
+            gameLoop() {
+                this.animationFrame++;
+                this.render();
+                requestAnimationFrame(() => this.gameLoop());
+            }
+
             render() {
-                // Fond
-                this.ctx.fillStyle = '#1a1a2e';
+                // Fond avec dégradé
+                const gradient = this.ctx.createLinearGradient(0, 0, 0, this.canvas.height);
+                gradient.addColorStop(0, '#0d0d1a');
+                gradient.addColorStop(0.5, '#1a1a3e');
+                gradient.addColorStop(1, '#0d0d1a');
+                this.ctx.fillStyle = gradient;
                 this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
-                // Grille de fond
-                this.ctx.strokeStyle = '#2a2a4e';
+                // Grille subtile
+                this.ctx.strokeStyle = 'rgba(74, 74, 106, 0.3)';
                 this.ctx.lineWidth = 1;
                 for (let x = 0; x <= GRID_WIDTH; x++) {
                     this.ctx.beginPath();
@@ -745,129 +1137,472 @@
                 const px = x * TILE_SIZE;
                 const py = y * TILE_SIZE;
                 const padding = 2;
+                const size = TILE_SIZE - padding * 2;
+                const centerX = px + TILE_SIZE / 2;
+                const centerY = py + TILE_SIZE / 2;
 
-                const color = Colors[obj.type] || '#ffffff';
+                const colorData = Colors[obj.type];
+
+                // Animation de flottement pour les objets YOU
+                let offsetY = 0;
+                if (this.hasProperty(obj.type, 'you') && !obj.type.startsWith('text_')) {
+                    offsetY = Math.sin(this.animationFrame * 0.1 + obj.id * 10) * 2;
+                }
 
                 if (obj.type.startsWith('text_')) {
-                    // Dessiner un bloc de texte
-                    this.ctx.fillStyle = '#333';
-                    this.ctx.fillRect(px + padding, py + padding, TILE_SIZE - padding * 2, TILE_SIZE - padding * 2);
+                    // Bloc de texte avec effet néon
+                    const color = typeof colorData === 'string' ? colorData : '#ffffff';
 
+                    // Ombre portée
+                    this.ctx.shadowColor = color;
+                    this.ctx.shadowBlur = 10;
+
+                    // Fond du bloc
+                    const textGradient = this.ctx.createLinearGradient(px, py, px, py + TILE_SIZE);
+                    textGradient.addColorStop(0, '#2a2a4a');
+                    textGradient.addColorStop(1, '#1a1a2a');
+                    this.ctx.fillStyle = textGradient;
+                    this.ctx.fillRect(px + padding, py + padding, size, size);
+
+                    // Bordure lumineuse
                     this.ctx.strokeStyle = color;
                     this.ctx.lineWidth = 2;
-                    this.ctx.strokeRect(px + padding, py + padding, TILE_SIZE - padding * 2, TILE_SIZE - padding * 2);
+                    this.ctx.strokeRect(px + padding, py + padding, size, size);
 
                     // Texte
+                    this.ctx.shadowBlur = 15;
                     this.ctx.fillStyle = color;
-                    this.ctx.font = 'bold 10px Courier New';
+                    this.ctx.font = 'bold 10px "Press Start 2P", monospace';
                     this.ctx.textAlign = 'center';
                     this.ctx.textBaseline = 'middle';
 
                     const text = obj.type.replace('text_', '').toUpperCase();
-                    this.ctx.fillText(text, px + TILE_SIZE / 2, py + TILE_SIZE / 2);
+                    this.ctx.fillText(text, centerX, centerY);
+
+                    this.ctx.shadowBlur = 0;
                 } else {
-                    // Dessiner une entité
-                    this.ctx.fillStyle = color;
+                    const colors = typeof colorData === 'object' ? colorData : { main: colorData, accent: colorData };
+
+                    // Ombre douce
+                    this.ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
+                    this.ctx.shadowBlur = 5;
+                    this.ctx.shadowOffsetY = 3;
 
                     switch (obj.type) {
                         case 'baba':
-                            // Lapin mignon
-                            this.ctx.beginPath();
-                            this.ctx.arc(px + TILE_SIZE / 2, py + TILE_SIZE / 2 + 5, 12, 0, Math.PI * 2);
-                            this.ctx.fill();
-                            // Oreilles
-                            this.ctx.fillRect(px + 12, py + 5, 4, 12);
-                            this.ctx.fillRect(px + 24, py + 5, 4, 12);
-                            // Yeux
-                            this.ctx.fillStyle = '#ff6b9d';
-                            this.ctx.beginPath();
-                            this.ctx.arc(px + 16, py + 22, 3, 0, Math.PI * 2);
-                            this.ctx.arc(px + 24, py + 22, 3, 0, Math.PI * 2);
-                            this.ctx.fill();
+                            this.drawBaba(centerX, centerY + offsetY, colors);
                             break;
-
                         case 'wall':
-                            // Brique
-                            this.ctx.fillRect(px + padding, py + padding, TILE_SIZE - padding * 2, TILE_SIZE - padding * 2);
-                            this.ctx.strokeStyle = '#5a4a0a';
-                            this.ctx.lineWidth = 2;
-                            this.ctx.strokeRect(px + padding, py + padding, TILE_SIZE - padding * 2, TILE_SIZE - padding * 2);
-                            // Lignes de brique
-                            this.ctx.beginPath();
-                            this.ctx.moveTo(px + padding, py + TILE_SIZE / 2);
-                            this.ctx.lineTo(px + TILE_SIZE - padding, py + TILE_SIZE / 2);
-                            this.ctx.moveTo(px + TILE_SIZE / 2, py + padding);
-                            this.ctx.lineTo(px + TILE_SIZE / 2, py + TILE_SIZE / 2);
-                            this.ctx.moveTo(px + TILE_SIZE / 4, py + TILE_SIZE / 2);
-                            this.ctx.lineTo(px + TILE_SIZE / 4, py + TILE_SIZE - padding);
-                            this.ctx.moveTo(px + 3 * TILE_SIZE / 4, py + TILE_SIZE / 2);
-                            this.ctx.lineTo(px + 3 * TILE_SIZE / 4, py + TILE_SIZE - padding);
-                            this.ctx.stroke();
+                            this.drawWall(px, py, colors);
                             break;
-
                         case 'rock':
-                            // Rocher
-                            this.ctx.beginPath();
-                            this.ctx.arc(px + TILE_SIZE / 2, py + TILE_SIZE / 2, 15, 0, Math.PI * 2);
-                            this.ctx.fill();
-                            this.ctx.strokeStyle = '#8b4513';
-                            this.ctx.lineWidth = 2;
-                            this.ctx.stroke();
+                            this.drawRock(centerX, centerY + offsetY, colors);
                             break;
-
                         case 'flag':
-                            // Drapeau
-                            this.ctx.fillStyle = '#8b4513';
-                            this.ctx.fillRect(px + TILE_SIZE / 2 - 2, py + 8, 4, 26);
-                            this.ctx.fillStyle = color;
-                            this.ctx.beginPath();
-                            this.ctx.moveTo(px + TILE_SIZE / 2, py + 8);
-                            this.ctx.lineTo(px + TILE_SIZE - 5, py + 15);
-                            this.ctx.lineTo(px + TILE_SIZE / 2, py + 22);
-                            this.ctx.closePath();
-                            this.ctx.fill();
+                            this.drawFlag(px, py + offsetY, colors);
                             break;
-
                         case 'water':
-                            // Eau
-                            this.ctx.fillRect(px + padding, py + padding, TILE_SIZE - padding * 2, TILE_SIZE - padding * 2);
-                            // Vagues
-                            this.ctx.strokeStyle = '#87ceeb';
-                            this.ctx.lineWidth = 2;
-                            this.ctx.beginPath();
-                            for (let i = 0; i < 3; i++) {
-                                const waveY = py + 10 + i * 10;
-                                this.ctx.moveTo(px + 5, waveY);
-                                this.ctx.quadraticCurveTo(px + TILE_SIZE / 4, waveY - 5, px + TILE_SIZE / 2, waveY);
-                                this.ctx.quadraticCurveTo(px + 3 * TILE_SIZE / 4, waveY + 5, px + TILE_SIZE - 5, waveY);
-                            }
-                            this.ctx.stroke();
+                            this.drawWater(px, py, colors);
                             break;
-
                         case 'lava':
-                            // Lave
-                            this.ctx.fillRect(px + padding, py + padding, TILE_SIZE - padding * 2, TILE_SIZE - padding * 2);
-                            // Bulles
-                            this.ctx.fillStyle = '#ffff00';
-                            this.ctx.beginPath();
-                            this.ctx.arc(px + 12, py + 15, 4, 0, Math.PI * 2);
-                            this.ctx.arc(px + 28, py + 25, 3, 0, Math.PI * 2);
-                            this.ctx.arc(px + 18, py + 30, 2, 0, Math.PI * 2);
-                            this.ctx.fill();
+                            this.drawLava(px, py, colors);
                             break;
-
+                        case 'key':
+                            this.drawKey(centerX, centerY + offsetY, colors);
+                            break;
+                        case 'door':
+                            this.drawDoor(px, py, colors);
+                            break;
+                        case 'skull':
+                            this.drawSkull(centerX, centerY + offsetY, colors);
+                            break;
+                        case 'grass':
+                            this.drawGrass(px, py, colors);
+                            break;
+                        case 'ice':
+                            this.drawIce(px, py, colors);
+                            break;
                         default:
-                            // Par défaut: carré
-                            this.ctx.fillRect(px + padding, py + padding, TILE_SIZE - padding * 2, TILE_SIZE - padding * 2);
+                            this.ctx.fillStyle = colors.main;
+                            this.ctx.fillRect(px + padding, py + padding, size, size);
+                    }
+
+                    this.ctx.shadowBlur = 0;
+                    this.ctx.shadowOffsetY = 0;
+
+                    // Contour brillant pour YOU
+                    if (this.hasProperty(obj.type, 'you')) {
+                        this.ctx.strokeStyle = `rgba(255, 105, 180, ${0.5 + Math.sin(this.animationFrame * 0.1) * 0.3})`;
+                        this.ctx.lineWidth = 3;
+                        this.ctx.strokeRect(px + 1, py + 1, TILE_SIZE - 2, TILE_SIZE - 2);
                     }
                 }
+            }
 
-                // Indicateur si l'objet a YOU
-                if (this.hasProperty(obj.type, 'you') && !obj.type.startsWith('text_')) {
-                    this.ctx.strokeStyle = '#ff69b4';
-                    this.ctx.lineWidth = 2;
-                    this.ctx.strokeRect(px + 1, py + 1, TILE_SIZE - 2, TILE_SIZE - 2);
+            drawBaba(cx, cy, colors) {
+                // Corps
+                const bodyGradient = this.ctx.createRadialGradient(cx, cy + 3, 0, cx, cy + 3, 14);
+                bodyGradient.addColorStop(0, colors.accent);
+                bodyGradient.addColorStop(1, colors.main);
+                this.ctx.fillStyle = bodyGradient;
+                this.ctx.beginPath();
+                this.ctx.ellipse(cx, cy + 5, 12, 10, 0, 0, Math.PI * 2);
+                this.ctx.fill();
+
+                // Oreilles
+                this.ctx.fillStyle = colors.main;
+                this.ctx.beginPath();
+                this.ctx.ellipse(cx - 6, cy - 10, 4, 10, -0.2, 0, Math.PI * 2);
+                this.ctx.fill();
+                this.ctx.beginPath();
+                this.ctx.ellipse(cx + 6, cy - 10, 4, 10, 0.2, 0, Math.PI * 2);
+                this.ctx.fill();
+
+                // Intérieur oreilles
+                this.ctx.fillStyle = '#ffb6c1';
+                this.ctx.beginPath();
+                this.ctx.ellipse(cx - 6, cy - 9, 2, 6, -0.2, 0, Math.PI * 2);
+                this.ctx.fill();
+                this.ctx.beginPath();
+                this.ctx.ellipse(cx + 6, cy - 9, 2, 6, 0.2, 0, Math.PI * 2);
+                this.ctx.fill();
+
+                // Yeux
+                this.ctx.fillStyle = '#ff69b4';
+                this.ctx.beginPath();
+                this.ctx.arc(cx - 4, cy + 2, 3, 0, Math.PI * 2);
+                this.ctx.arc(cx + 4, cy + 2, 3, 0, Math.PI * 2);
+                this.ctx.fill();
+
+                // Reflets yeux
+                this.ctx.fillStyle = '#fff';
+                this.ctx.beginPath();
+                this.ctx.arc(cx - 5, cy + 1, 1, 0, Math.PI * 2);
+                this.ctx.arc(cx + 3, cy + 1, 1, 0, Math.PI * 2);
+                this.ctx.fill();
+
+                // Nez
+                this.ctx.fillStyle = '#ffb6c1';
+                this.ctx.beginPath();
+                this.ctx.arc(cx, cy + 6, 2, 0, Math.PI * 2);
+                this.ctx.fill();
+            }
+
+            drawWall(px, py, colors) {
+                const gradient = this.ctx.createLinearGradient(px, py, px + TILE_SIZE, py + TILE_SIZE);
+                gradient.addColorStop(0, colors.accent);
+                gradient.addColorStop(1, colors.main);
+                this.ctx.fillStyle = gradient;
+                this.ctx.fillRect(px + 2, py + 2, TILE_SIZE - 4, TILE_SIZE - 4);
+
+                // Motif briques
+                this.ctx.strokeStyle = 'rgba(0, 0, 0, 0.3)';
+                this.ctx.lineWidth = 2;
+
+                // Ligne horizontale au milieu
+                this.ctx.beginPath();
+                this.ctx.moveTo(px + 2, py + TILE_SIZE / 2);
+                this.ctx.lineTo(px + TILE_SIZE - 2, py + TILE_SIZE / 2);
+                this.ctx.stroke();
+
+                // Lignes verticales
+                this.ctx.beginPath();
+                this.ctx.moveTo(px + TILE_SIZE / 2, py + 2);
+                this.ctx.lineTo(px + TILE_SIZE / 2, py + TILE_SIZE / 2);
+                this.ctx.stroke();
+
+                this.ctx.beginPath();
+                this.ctx.moveTo(px + TILE_SIZE / 4, py + TILE_SIZE / 2);
+                this.ctx.lineTo(px + TILE_SIZE / 4, py + TILE_SIZE - 2);
+                this.ctx.stroke();
+
+                this.ctx.beginPath();
+                this.ctx.moveTo(px + 3 * TILE_SIZE / 4, py + TILE_SIZE / 2);
+                this.ctx.lineTo(px + 3 * TILE_SIZE / 4, py + TILE_SIZE - 2);
+                this.ctx.stroke();
+
+                // Highlight
+                this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+                this.ctx.lineWidth = 1;
+                this.ctx.strokeRect(px + 3, py + 3, TILE_SIZE - 8, TILE_SIZE - 8);
+            }
+
+            drawRock(cx, cy, colors) {
+                const gradient = this.ctx.createRadialGradient(cx - 5, cy - 5, 0, cx, cy, 18);
+                gradient.addColorStop(0, colors.accent);
+                gradient.addColorStop(1, colors.main);
+                this.ctx.fillStyle = gradient;
+
+                // Forme irrégulière
+                this.ctx.beginPath();
+                this.ctx.moveTo(cx - 12, cy + 5);
+                this.ctx.quadraticCurveTo(cx - 15, cy - 5, cx - 8, cy - 12);
+                this.ctx.quadraticCurveTo(cx, cy - 16, cx + 10, cy - 10);
+                this.ctx.quadraticCurveTo(cx + 16, cy - 3, cx + 12, cy + 8);
+                this.ctx.quadraticCurveTo(cx + 5, cy + 14, cx - 5, cy + 12);
+                this.ctx.quadraticCurveTo(cx - 14, cy + 10, cx - 12, cy + 5);
+                this.ctx.fill();
+
+                // Reflet
+                this.ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+                this.ctx.beginPath();
+                this.ctx.ellipse(cx - 5, cy - 5, 4, 3, -0.5, 0, Math.PI * 2);
+                this.ctx.fill();
+            }
+
+            drawFlag(px, py, colors) {
+                const cy = py + TILE_SIZE / 2;
+
+                // Mât
+                const matGradient = this.ctx.createLinearGradient(px + TILE_SIZE / 2 - 2, py, px + TILE_SIZE / 2 + 2, py);
+                matGradient.addColorStop(0, '#4a3000');
+                matGradient.addColorStop(0.5, '#8b6914');
+                matGradient.addColorStop(1, '#4a3000');
+                this.ctx.fillStyle = matGradient;
+                this.ctx.fillRect(px + TILE_SIZE / 2 - 2, py + 6, 4, 28);
+
+                // Drapeau avec animation
+                const waveOffset = Math.sin(this.animationFrame * 0.15) * 2;
+
+                const flagGradient = this.ctx.createLinearGradient(px + TILE_SIZE / 2, py + 6, px + TILE_SIZE - 2, py + 15);
+                flagGradient.addColorStop(0, colors.accent);
+                flagGradient.addColorStop(1, colors.main);
+                this.ctx.fillStyle = flagGradient;
+
+                this.ctx.beginPath();
+                this.ctx.moveTo(px + TILE_SIZE / 2, py + 6);
+                this.ctx.quadraticCurveTo(px + TILE_SIZE / 2 + 10, py + 10 + waveOffset, px + TILE_SIZE - 4, py + 12);
+                this.ctx.lineTo(px + TILE_SIZE - 6, py + 22);
+                this.ctx.quadraticCurveTo(px + TILE_SIZE / 2 + 8, py + 20 - waveOffset, px + TILE_SIZE / 2, py + 24);
+                this.ctx.closePath();
+                this.ctx.fill();
+
+                // Étoile sur le drapeau
+                this.ctx.fillStyle = '#fff';
+                this.drawStar(px + TILE_SIZE / 2 + 10, py + 15, 3, 5, 0.5);
+            }
+
+            drawStar(cx, cy, radius, points, innerRadius) {
+                this.ctx.beginPath();
+                for (let i = 0; i < points * 2; i++) {
+                    const r = i % 2 === 0 ? radius : radius * innerRadius;
+                    const angle = (i * Math.PI) / points - Math.PI / 2;
+                    const x = cx + r * Math.cos(angle);
+                    const y = cy + r * Math.sin(angle);
+                    if (i === 0) this.ctx.moveTo(x, y);
+                    else this.ctx.lineTo(x, y);
                 }
+                this.ctx.closePath();
+                this.ctx.fill();
+            }
+
+            drawWater(px, py, colors) {
+                const gradient = this.ctx.createLinearGradient(px, py, px, py + TILE_SIZE);
+                gradient.addColorStop(0, colors.accent);
+                gradient.addColorStop(1, colors.main);
+                this.ctx.fillStyle = gradient;
+                this.ctx.fillRect(px + 2, py + 2, TILE_SIZE - 4, TILE_SIZE - 4);
+
+                // Vagues animées
+                this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
+                this.ctx.lineWidth = 2;
+
+                for (let i = 0; i < 3; i++) {
+                    const waveY = py + 10 + i * 10;
+                    const offset = Math.sin(this.animationFrame * 0.1 + i) * 3;
+
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(px + 4, waveY + offset);
+                    this.ctx.quadraticCurveTo(px + 12, waveY - 4 + offset, px + 20, waveY + offset);
+                    this.ctx.quadraticCurveTo(px + 28, waveY + 4 + offset, px + 36, waveY + offset);
+                    this.ctx.stroke();
+                }
+            }
+
+            drawLava(px, py, colors) {
+                const gradient = this.ctx.createLinearGradient(px, py, px, py + TILE_SIZE);
+                gradient.addColorStop(0, colors.accent);
+                gradient.addColorStop(0.5, colors.main);
+                gradient.addColorStop(1, '#8b0000');
+                this.ctx.fillStyle = gradient;
+                this.ctx.fillRect(px + 2, py + 2, TILE_SIZE - 4, TILE_SIZE - 4);
+
+                // Bulles animées
+                const bubbleTime = this.animationFrame * 0.05;
+                for (let i = 0; i < 4; i++) {
+                    const bubbleX = px + 8 + (i * 8) + Math.sin(bubbleTime + i * 2) * 3;
+                    const bubbleY = py + 30 - ((bubbleTime * 20 + i * 15) % 25);
+                    const bubbleSize = 2 + Math.sin(bubbleTime + i) * 1;
+
+                    this.ctx.fillStyle = `rgba(255, 255, 0, ${0.6 + Math.sin(bubbleTime + i) * 0.3})`;
+                    this.ctx.beginPath();
+                    this.ctx.arc(bubbleX, bubbleY, bubbleSize, 0, Math.PI * 2);
+                    this.ctx.fill();
+                }
+
+                // Lueur
+                this.ctx.shadowColor = '#ff4500';
+                this.ctx.shadowBlur = 10;
+                this.ctx.strokeStyle = 'rgba(255, 200, 0, 0.5)';
+                this.ctx.lineWidth = 2;
+                this.ctx.strokeRect(px + 3, py + 3, TILE_SIZE - 6, TILE_SIZE - 6);
+                this.ctx.shadowBlur = 0;
+            }
+
+            drawKey(cx, cy, colors) {
+                this.ctx.shadowColor = colors.main;
+                this.ctx.shadowBlur = 10;
+
+                const gradient = this.ctx.createRadialGradient(cx - 3, cy - 8, 0, cx, cy - 5, 10);
+                gradient.addColorStop(0, colors.accent);
+                gradient.addColorStop(1, colors.main);
+                this.ctx.fillStyle = gradient;
+
+                // Tête de la clé
+                this.ctx.beginPath();
+                this.ctx.arc(cx, cy - 5, 8, 0, Math.PI * 2);
+                this.ctx.fill();
+
+                // Trou dans la tête
+                this.ctx.fillStyle = '#1a1a2e';
+                this.ctx.beginPath();
+                this.ctx.arc(cx, cy - 5, 3, 0, Math.PI * 2);
+                this.ctx.fill();
+
+                // Tige
+                this.ctx.fillStyle = gradient;
+                this.ctx.fillRect(cx - 2, cy + 2, 4, 14);
+
+                // Dents
+                this.ctx.fillRect(cx + 2, cy + 10, 5, 3);
+                this.ctx.fillRect(cx + 2, cy + 5, 4, 3);
+
+                this.ctx.shadowBlur = 0;
+            }
+
+            drawDoor(px, py, colors) {
+                const gradient = this.ctx.createLinearGradient(px, py, px + TILE_SIZE, py + TILE_SIZE);
+                gradient.addColorStop(0, colors.accent);
+                gradient.addColorStop(1, colors.main);
+                this.ctx.fillStyle = gradient;
+                this.ctx.fillRect(px + 4, py + 2, TILE_SIZE - 8, TILE_SIZE - 4);
+
+                // Cadre
+                this.ctx.strokeStyle = '#4a0000';
+                this.ctx.lineWidth = 3;
+                this.ctx.strokeRect(px + 4, py + 2, TILE_SIZE - 8, TILE_SIZE - 4);
+
+                // Panneau décoratif
+                this.ctx.strokeStyle = '#2a0000';
+                this.ctx.lineWidth = 2;
+                this.ctx.strokeRect(px + 8, py + 6, TILE_SIZE - 16, 12);
+                this.ctx.strokeRect(px + 8, py + 22, TILE_SIZE - 16, 10);
+
+                // Poignée
+                this.ctx.fillStyle = '#ffd700';
+                this.ctx.beginPath();
+                this.ctx.arc(px + TILE_SIZE - 10, py + TILE_SIZE / 2, 3, 0, Math.PI * 2);
+                this.ctx.fill();
+            }
+
+            drawSkull(cx, cy, colors) {
+                // Crâne
+                const gradient = this.ctx.createRadialGradient(cx, cy - 2, 0, cx, cy, 16);
+                gradient.addColorStop(0, colors.accent);
+                gradient.addColorStop(1, colors.main);
+                this.ctx.fillStyle = gradient;
+
+                // Forme du crâne
+                this.ctx.beginPath();
+                this.ctx.ellipse(cx, cy - 3, 12, 10, 0, 0, Math.PI * 2);
+                this.ctx.fill();
+
+                // Mâchoire
+                this.ctx.beginPath();
+                this.ctx.ellipse(cx, cy + 8, 8, 5, 0, 0, Math.PI);
+                this.ctx.fill();
+
+                // Yeux (orbites noires)
+                this.ctx.fillStyle = '#1a1a2e';
+                this.ctx.beginPath();
+                this.ctx.ellipse(cx - 5, cy - 3, 4, 5, 0, 0, Math.PI * 2);
+                this.ctx.fill();
+                this.ctx.beginPath();
+                this.ctx.ellipse(cx + 5, cy - 3, 4, 5, 0, 0, Math.PI * 2);
+                this.ctx.fill();
+
+                // Lueur rouge dans les yeux
+                this.ctx.fillStyle = '#ff0000';
+                this.ctx.shadowColor = '#ff0000';
+                this.ctx.shadowBlur = 5;
+                this.ctx.beginPath();
+                this.ctx.arc(cx - 5, cy - 3, 1.5, 0, Math.PI * 2);
+                this.ctx.arc(cx + 5, cy - 3, 1.5, 0, Math.PI * 2);
+                this.ctx.fill();
+                this.ctx.shadowBlur = 0;
+
+                // Nez
+                this.ctx.fillStyle = '#1a1a2e';
+                this.ctx.beginPath();
+                this.ctx.moveTo(cx, cy + 1);
+                this.ctx.lineTo(cx - 2, cy + 5);
+                this.ctx.lineTo(cx + 2, cy + 5);
+                this.ctx.closePath();
+                this.ctx.fill();
+
+                // Dents
+                this.ctx.fillStyle = colors.main;
+                for (let i = -3; i <= 3; i++) {
+                    this.ctx.fillRect(cx + i * 3 - 1, cy + 8, 2, 4);
+                }
+            }
+
+            drawGrass(px, py, colors) {
+                this.ctx.fillStyle = colors.main;
+                this.ctx.fillRect(px + 2, py + 2, TILE_SIZE - 4, TILE_SIZE - 4);
+
+                // Brins d'herbe
+                this.ctx.strokeStyle = colors.accent;
+                this.ctx.lineWidth = 2;
+
+                for (let i = 0; i < 6; i++) {
+                    const x = px + 6 + i * 5;
+                    const waveOffset = Math.sin(this.animationFrame * 0.05 + i) * 2;
+
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(x, py + TILE_SIZE - 4);
+                    this.ctx.quadraticCurveTo(x + waveOffset, py + TILE_SIZE / 2, x + waveOffset * 2, py + 8);
+                    this.ctx.stroke();
+                }
+            }
+
+            drawIce(px, py, colors) {
+                const gradient = this.ctx.createLinearGradient(px, py, px + TILE_SIZE, py + TILE_SIZE);
+                gradient.addColorStop(0, colors.accent);
+                gradient.addColorStop(0.5, colors.main);
+                gradient.addColorStop(1, 'rgba(255, 255, 255, 0.8)');
+                this.ctx.fillStyle = gradient;
+                this.ctx.fillRect(px + 2, py + 2, TILE_SIZE - 4, TILE_SIZE - 4);
+
+                // Reflets
+                this.ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+                this.ctx.beginPath();
+                this.ctx.moveTo(px + 8, py + 6);
+                this.ctx.lineTo(px + 20, py + 6);
+                this.ctx.lineTo(px + 12, py + 14);
+                this.ctx.closePath();
+                this.ctx.fill();
+
+                // Cristaux
+                this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
+                this.ctx.lineWidth = 1;
+                this.ctx.beginPath();
+                this.ctx.moveTo(px + 25, py + 20);
+                this.ctx.lineTo(px + 30, py + 15);
+                this.ctx.lineTo(px + 35, py + 20);
+                this.ctx.moveTo(px + 30, py + 15);
+                this.ctx.lineTo(px + 30, py + 25);
+                this.ctx.stroke();
             }
         }
 
